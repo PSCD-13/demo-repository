@@ -1,0 +1,13 @@
+idf_component_register(
+    SRCS
+        "max30205_sensor.cpp"
+        "max30102_sensor.cpp"
+    INCLUDE_DIRS
+        "."
+    REQUIRES
+        esp_driver_i2c
+        esp_driver_gpio
+        freertos
+        esp_timer
+        log
+)

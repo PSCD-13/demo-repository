@@ -1,0 +1,91 @@
+Command: /home/wes/.espressif/python_env/idf6.1_py3.12_env/bin/python /home/wes/esp/esp-idf/tools/idf_monitor.py -p /dev/ttyUSB0 -b 115200 --toolchain-prefix xtensa-esp32-elf- --target esp32 --revision 0 /home/wes/pscd/demo-repository/firmware/esp32/build/pscd_wearable.elf /home/wes/pscd/demo-repository/firmware/esp32/build/bootloader/bootloader.elf -m '/home/wes/.espressif/python_env/idf6.1_py3.12_env/bin/python' '/home/wes/esp/esp-idf/tools/idf.py'
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0040,len:6272
+load:0x40078000,len:15848
+load:0x40080400,len:3988
+entry 0x40080644
+[0;32mI (27) boot: ESP-IDF v6.1-dev-4182-g47faecc3e4 2nd stage bootloader[0m
+[0;32mI (27) boot: compile time Jun  1 2026 09:39:11[0m
+[0;32mI (28) boot: Multicore bootloader[0m
+[0;32mI (30) boot: chip revision: v3.1[0m
+[0;32mI (33) boot.esp32: SPI Speed      : 40MHz[0m
+[0;32mI (37) boot.esp32: SPI Mode       : DIO[0m
+[0;32mI (40) boot.esp32: SPI Flash Size : 2MB[0m
+[0;32mI (44) boot: Enabling RNG early entropy source...[0m
+[0;32mI (49) boot: Partition Table:[0m
+[0;32mI (51) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (57) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (64) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (71) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (77) boot: End of partition table[0m
+[0;32mI (80) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=0f858h ( 63576) map[0m
+[0;32mI (110) esp_image: segment 1: paddr=0001f880 vaddr=3ffb0000 size=00798h (  1944) load[0m
+[0;32mI (112) esp_image: segment 2: paddr=00020020 vaddr=400d0020 size=20c8ch (134284) map[0m
+[0;32mI (162) esp_image: segment 3: paddr=00040cb4 vaddr=3ffb0798 size=02548h (  9544) load[0m
+[0;32mI (166) esp_image: segment 4: paddr=00043204 vaddr=40080000 size=0da70h ( 55920) load[0m
+[0;32mI (189) esp_image: segment 5: paddr=00050c7c vaddr=50000000 size=00028h (    40) load[0m
+[0;32mI (196) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (197) boot: Disabling RNG early entropy source...[0m
+[0;32mI (207) cpu_start: Multicore app[0m
+[0;32mI (216) cpu_start: GPIO 3 and 1 are used as console UART I/O pins[0m
+[0;32mI (216) cpu_start: Pro cpu start user code[0m
+[0;32mI (216) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (218) app_init: Application information:[0m
+[0;32mI (222) app_init: Project name:     pscd_wearable[0m
+[0;32mI (226) app_init: App version:      479940b[0m
+[0;32mI (230) app_init: Compile time:     Jun  1 2026 09:39:05[0m
+[0;32mI (235) app_init: ELF file SHA256:  1bf0637f1...[0m
+[0;32mI (239) app_init: ESP-IDF:          v6.1-dev-4182-g47faecc3e4[0m
+[0;32mI (245) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (249) efuse_init: Max chip rev:     v3.99 [0m
+[0;32mI (253) efuse_init: Chip rev:         v3.1[0m
+[0;32mI (257) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (263) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM[0m
+[0;32mI (268) heap_init: At 3FFB37E8 len 0002C818 (178 KiB): DRAM[0m
+[0;32mI (273) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM[0m
+[0;32mI (278) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM[0m
+[0;32mI (284) heap_init: At 4008DA70 len 00012590 (73 KiB): IRAM[0m
+[0;32mI (291) spi_flash: detected chip: generic[0m
+[0;32mI (293) spi_flash: flash io: dio[0m
+[0;33mW (296) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;32mI (309) main_task: Started on CPU0[0m
+[0;32mI (319) main_task: Calling app_main()[0m
+[0;32mI (319) system_controller: Starting system controller[0m
+[0;32mI (319) sd_module: Starting SD module[0m
+[0;32mI (319) sdspi_transaction: cmd=52, R1 response: command not supported[0m
+[0;32mI (369) sdspi_transaction: cmd=5, R1 response: command not supported[0m
+[1;31mE (379) sdmmc_sd: sdmmc_check_scr: send_scr returned 0x109[0m
+[1;31mE (379) vfs_fat_sdmmc: sdmmc_card_init failed (0x109).[0m
+[0;33mW (379) gpio: conflict found for GPIO[15][0m
+[1;31mE (389) vfs_fat_sdmmc: esp_vfs_fat_sdspi_sdcard_init failed (0x109).[0m
+[1;31mE (389) sd_module: Failed to mount SD card: ESP_ERR_INVALID_CRC[0m
+[1;31mE (399) system_controller: SD module failed to start[0m
+[0;33mW (399) system_controller: System will continue without SD logging[0m
+[0;32mI (409) system_controller: Starting shared I2C bus[0m
+[0;32mI (409) system_controller: I2C bus ready. SDA=21 SCL=22[0m
+[0;32mI (419) max30205_sensor: Starting MAX30205 temperature sensor[0m
+[0;32mI (429) max30205_sensor: MAX30205 ready at address 0x48[0m
+[0;32mI (429) system_controller: Temperature sensor started[0m
+[0;32mI (429) max30102_sensor: Starting MAX30102 heart-rate sensor[0m
+[1;31mE (439) max30102_sensor: Read register 0xFF failed: ESP_ERR_INVALID_RESPONSE[0m
+[1;31mE (449) max30102_sensor: Could not read MAX30102 part ID[0m
+[1;31mE (449) system_controller: Heart-rate sensor failed[0m
+[0;32mI (459) system_controller: System controller ready[0m
+[0;32mI (459) system_controller: Controller loop started[0m
+[0;32mI (469) system_controller: Temperature: 25.74 C[0m
+[0;32mI (469) system_controller: Heart rate: invalid[0m
+[0;32mI (1469) system_controller: Temperature: 25.74 C[0m
+[0;32mI (1469) system_controller: Heart rate: invalid[0m
+[0;32mI (2469) system_controller: Temperature: 25.75 C[0m
+[0;32mI (2469) system_controller: Heart rate: invalid[0m
+[0;32mI (3469) system_controller: Temperature: 25.73 C[0m
+[0;32mI (3469) system_controller: Heart rate: invalid[0m
+[0;32mI (4469) system_controller: Temperature: 25.75 C[0m
+[0;32mI (4469) system_controller: Heart rate: invalid[0m
+[0;32mI (5469) system_controller: Temperature: 25.73 C[0m
+[0;32mI (5469) system_controller: Heart rate: invalid[0m

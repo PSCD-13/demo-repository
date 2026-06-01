@@ -1,0 +1,15 @@
+idf_component_register(
+    SRCS
+        "system_controller.cpp"
+    INCLUDE_DIRS
+        "."
+    REQUIRES
+        models
+        storage
+        sensors
+        esp_driver_i2c
+        esp_driver_gpio
+        esp_timer
+        freertos
+        log
+)

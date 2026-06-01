@@ -1,0 +1,2 @@
+source /home/wes/pscd/demo-repository/firmware/esp32/build/bootloader/gdbinit/symbols
+source /home/wes/pscd/demo-repository/firmware/esp32/build/bootloader/gdbinit/connect

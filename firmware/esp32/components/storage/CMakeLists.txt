@@ -1,0 +1,12 @@
+idf_component_register(
+    SRCS
+        "sd_module.cpp"
+    INCLUDE_DIRS
+        "."
+    REQUIRES
+        models
+        fatfs
+        sdmmc
+        driver
+        esp_driver_sdspi
+)

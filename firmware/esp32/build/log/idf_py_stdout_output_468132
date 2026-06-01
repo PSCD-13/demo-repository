@@ -1,0 +1,23 @@
+Command: ninja all
+[1/13] Performing build step for 'bootloader'
+[1/1] cd /home/wes/pscd/demo-repository/firmware/esp32/build/bootloader && /home/wes/.espressif/python_env/idf6.1_py3.12_env/bin/python /home/wes/esp/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x1000 /home/wes/pscd/demo-repository/firmware/esp32/build/bootloader/bootloader.bin
+Bootloader binary size 0x6650 bytes. 0x9b0 bytes (9%) free.
+[2/13] No install step for 'bootloader'
+[3/13] Completed 'bootloader'
+[4/13] Building CXX object esp-idf/main/CMakeFiles/__idf_main.dir/main.cpp.obj
+[5/13] Building CXX object esp-idf/app/CMakeFiles/__idf_app.dir/system_controller.cpp.obj
+[6/13] Building CXX object esp-idf/storage/CMakeFiles/__idf_storage.dir/sd_module.cpp.obj
+[7/13] Linking C static library esp-idf/storage/libstorage.a
+[8/13] Linking C static library esp-idf/main/libmain.a
+[9/13] Linking C static library esp-idf/app/libapp.a
+[10/13] Generating esp-idf/esp_system/ld/sections.ld
+Skipping linker script generation, section names unchanged
+[11/13] Linking CXX executable pscd_wearable.elf
+[12/13] Generating binary image from built executable
+esptool v5.3.dev2
+Creating ESP32 image...
+Merged 3 ELF sections.
+Successfully created ESP32 image.
+Generated /home/wes/pscd/demo-repository/firmware/esp32/build/pscd_wearable.bin
+[13/13] cd /home/wes/pscd/demo-repository/firmware/esp32/build && /home/wes/.espressif/python_env/idf6.1_py3.12_env/bin/python /home/wes/esp/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 partition --type app /home/wes/pscd/demo-repository/firmware/esp32/build/partition_table/partition-table.bin /home/wes/pscd/demo-repository/firmware/esp32/build/pscd_wearable.bin
+pscd_wearable.bin binary size 0x3be50 bytes. Smallest app partition is 0x100000 bytes. 0xc41b0 bytes (77%) free.
