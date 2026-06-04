@@ -2,9 +2,15 @@
 
 idf_component_register(
     SRCS
-        "main.cpp"
+        "communication_module.cpp"
+        "wifi_manager.c"
     INCLUDE_DIRS
         "."
     REQUIRES
-        app
+        models
+        esp_wifi
+        esp_event
+        esp_netif
+        nvs_flash
+        lwip
 )

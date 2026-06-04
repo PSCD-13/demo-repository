@@ -2,9 +2,12 @@
 
 idf_component_register(
     SRCS
-        "main.cpp"
+        "sd_module.cpp"
     INCLUDE_DIRS
         "."
     REQUIRES
-        app
+        models
+        sdmmc
+        fatfs
+        driver
 )

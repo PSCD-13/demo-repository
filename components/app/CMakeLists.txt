@@ -2,9 +2,14 @@
 
 idf_component_register(
     SRCS
-        "main.cpp"
+        "system_controller.cpp"
     INCLUDE_DIRS
         "."
     REQUIRES
-        app
+        communication
+        detection
+        display
+        models
+        sensors
+        storage
 )

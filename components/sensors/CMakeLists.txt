@@ -2,9 +2,11 @@
 
 idf_component_register(
     SRCS
-        "main.cpp"
+        "max30102_sensor.cpp"
+        "max30205_sensor.cpp"
     INCLUDE_DIRS
         "."
     REQUIRES
-        app
+        models
+        framework-arduinoespressif32
 )

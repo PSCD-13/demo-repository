@@ -2,9 +2,9 @@
 
 idf_component_register(
     SRCS
-        "main.cpp"
+        "detection_module.cpp"
     INCLUDE_DIRS
         "."
     REQUIRES
-        app
+        models
 )
