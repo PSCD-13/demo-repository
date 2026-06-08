@@ -1,3 +1,5 @@
+// Written with AI assistance for the specific question/context. All code has been reviewed and understood before implementation.
+
 #include "sd_module.hpp"
 
 #include <cstdio>
@@ -5,10 +7,11 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <Arduino.h>
+#include <SPI.h>
+#include <SD.h>
+
 #include "esp_log.h"
-#include "esp_err.h"
-#include "esp_vfs_fat.h"
-#include "driver/sdspi_host.h"
 
 static const char *TAG = "sd_module";
 
@@ -42,74 +45,30 @@ namespace pscd::storage
             return true;
         }
 
-        ESP_LOGI(TAG, "Starting SD module");
+        ESP_LOGI(TAG, "Starting SD module using Arduino SD/SPI");
 
-        // 1. Configure SPI bus pins.
-        spi_bus_config_t bus_config = {};
-        bus_config.mosi_io_num = m_pin_mosi;
-        bus_config.miso_io_num = m_pin_miso;
-        bus_config.sclk_io_num = m_pin_clk;
-        bus_config.quadwp_io_num = -1;
-        bus_config.quadhd_io_num = -1;
-        bus_config.max_transfer_sz = 1000;
+        pinMode(m_pin_cs, OUTPUT);
+        digitalWrite(m_pin_cs, HIGH);
+        SPI.begin(m_pin_clk, m_pin_miso, m_pin_mosi, m_pin_cs);
 
-        esp_err_t ret = spi_bus_initialize(
-            SPI_HOST_USED,
-            &bus_config,
-            SDSPI_DEFAULT_DMA);
-
-        if (ret != ESP_OK)
-        {
-            ESP_LOGE(TAG, "SPI bus init failed: %s", esp_err_to_name(ret));
-            return false;
-        }
-
-        m_spi_bus_started = true;
-
-        // 2. Configure SD card host.
-        sdmmc_host_t host = SDSPI_HOST_DEFAULT();
-        host.slot = SPI_HOST_USED;
-
-        // 3. Configure chip select pin.
-        sdspi_device_config_t slot_config = SDSPI_DEVICE_CONFIG_DEFAULT();
-        slot_config.gpio_cs = static_cast<gpio_num_t>(m_pin_cs);
-        slot_config.host_id = SPI_HOST_USED;
-
-        // 4. Configure FatFS mount.
-        esp_vfs_fat_sdmmc_mount_config_t mount_config = {};
-        mount_config.format_if_mount_failed = m_format_if_mount_failed;
-        mount_config.max_files = 5;
-        mount_config.allocation_unit_size = 16 * 1024;
-
-        // 5. Mount SD card.
-        ret = esp_vfs_fat_sdspi_mount(
+        const bool mounted = SD.begin(
+            static_cast<uint8_t>(m_pin_cs),
+            SPI,
+            20000000,
             MOUNT_POINT,
-            &host,
-            &slot_config,
-            &mount_config,
-            &m_card);
+            5,
+            m_format_if_mount_failed);
 
-        if (ret != ESP_OK)
+        if (!mounted)
         {
-            ESP_LOGE(TAG, "Failed to mount SD card: %s", esp_err_to_name(ret));
-
-            if (m_spi_bus_started)
-            {
-                spi_bus_free(SPI_HOST_USED);
-                m_spi_bus_started = false;
-            }
-
+            ESP_LOGE(TAG, "Failed to mount SD card using Arduino SD");
+            m_ready = false;
             return false;
         }
 
         ESP_LOGI(TAG, "SD card mounted");
+        ESP_LOGI(TAG, "SD card size: %llu MB", static_cast<unsigned long long>(SD.cardSize() / (1024ULL * 1024ULL)));
 
-        if (m_card != nullptr)
-        {
-            sdmmc_card_print_info(stdout, m_card);
-        }
-
-        // 6. Create CSV header if needed.
         if (!write_csv_header_if_needed())
         {
             ESP_LOGE(TAG, "Could not prepare CSV file");
@@ -117,7 +76,6 @@ namespace pscd::storage
             return false;
         }
 
-        // 7. Find the last used record id from the CSV file.
         if (!load_last_record_id_from_csv())
         {
             ESP_LOGE(TAG, "Could not read last record id");
@@ -133,25 +91,13 @@ namespace pscd::storage
 
     void sd_module::end()
     {
-        if (!m_ready && !m_spi_bus_started)
+        if (!m_ready)
         {
             return;
         }
 
         ESP_LOGI(TAG, "Stopping SD module");
-
-        if (m_card != nullptr)
-        {
-            esp_vfs_fat_sdcard_unmount(MOUNT_POINT, m_card);
-            m_card = nullptr;
-        }
-
-        if (m_spi_bus_started)
-        {
-            spi_bus_free(SPI_HOST_USED);
-            m_spi_bus_started = false;
-        }
-
+        SD.end();
         m_ready = false;
     }
 
@@ -168,7 +114,6 @@ namespace pscd::storage
             return false;
         }
 
-        // If the controller did not give an id yet, we create one here.
         if (record.record_id == 0)
         {
             record.record_id = m_last_record_id + 1;
@@ -182,10 +127,9 @@ namespace pscd::storage
             return false;
         }
 
-        // Keep this very explicit so it is easy to match with the CSV header.
         int written = fprintf(
             file,
-            "%lu,%lu,%d,%u,%d,%.2f,%d,%.2f,%d,%.3f,%.3f,%.3f,%d,%d,%d,%d,%d\n",
+            "%lu,%lu,%d,%u,%d,%.2f,%d,%.2f,%d,%d,%d,%d,%d,%d\n",
 
             static_cast<unsigned long>(record.record_id),
             static_cast<unsigned long>(record.timestamp_ms),
@@ -200,9 +144,6 @@ namespace pscd::storage
             record.ambient_temp_c,
 
             record.motion_valid ? 1 : 0,
-            record.accel_x,
-            record.accel_y,
-            record.accel_z,
 
             record.workout_mode ? 1 : 0,
             record.manual_log ? 1 : 0,
@@ -217,10 +158,8 @@ namespace pscd::storage
             return false;
         }
 
-        // Push C buffer to FatFS.
         fflush(file);
 
-        // Try to force it to the SD card.
         int fd = fileno(file);
         if (fd >= 0)
         {
@@ -252,8 +191,6 @@ namespace pscd::storage
 
         if (file == nullptr)
         {
-            // This is not a real error.
-            // It just means nothing has been sent yet.
             last_sent_id = 0;
             return true;
         }
@@ -336,8 +273,6 @@ namespace pscd::storage
 
         char line[256] = {};
 
-        // First line is the CSV header.
-        // We read and ignore it.
         fgets(line, sizeof(line), file);
 
         while (fgets(line, sizeof(line), file) != nullptr)
@@ -404,9 +339,6 @@ namespace pscd::storage
             "ambient_temp_valid,"
             "ambient_temp_c,"
             "motion_valid,"
-            "accel_x,"
-            "accel_y,"
-            "accel_z,"
             "workout_mode,"
             "manual_log,"
             "panic_pressed,"
@@ -452,14 +384,12 @@ namespace pscd::storage
 
         char line[256] = {};
 
-        // Skip header.
         fgets(line, sizeof(line), file);
 
         while (fgets(line, sizeof(line), file) != nullptr)
         {
             unsigned long id = 0;
 
-            // The record id is the first value in the line.
             if (sscanf(line, "%lu,", &id) == 1)
             {
                 if (id > m_last_record_id)
@@ -491,9 +421,6 @@ namespace pscd::storage
         float ambient_temp_c = 0.0f;
 
         int motion_valid = 0;
-        float accel_x = 0.0f;
-        float accel_y = 0.0f;
-        float accel_z = 0.0f;
 
         int workout_mode = 0;
         int manual_log = 0;
@@ -503,7 +430,7 @@ namespace pscd::storage
 
         int amount_found = sscanf(
             line,
-            "%lu,%lu,%d,%u,%d,%f,%d,%f,%d,%f,%f,%f,%d,%d,%d,%d,%d",
+            "%lu,%lu,%d,%u,%d,%f,%d,%f,%d,%d,%d,%d,%d,%d",
 
             &record_id,
             &timestamp_ms,
@@ -518,9 +445,6 @@ namespace pscd::storage
             &ambient_temp_c,
 
             &motion_valid,
-            &accel_x,
-            &accel_y,
-            &accel_z,
 
             &workout_mode,
             &manual_log,
@@ -528,7 +452,7 @@ namespace pscd::storage
             &fall_detected,
             &abnormal_heart_rate);
 
-        if (amount_found != 17)
+        if (amount_found != 14)
         {
             return false;
         }
@@ -546,9 +470,6 @@ namespace pscd::storage
         record.ambient_temp_c = ambient_temp_c;
 
         record.motion_valid = motion_valid != 0;
-        record.accel_x = accel_x;
-        record.accel_y = accel_y;
-        record.accel_z = accel_z;
 
         record.workout_mode = workout_mode != 0;
         record.manual_log = manual_log != 0;
@@ -563,10 +484,6 @@ namespace pscd::storage
         const char *path,
         const char *text)
     {
-        // We write to a temporary file first.
-        // Then we rename it to the real file.
-        // This is safer than directly overwriting sync_state.txt.
-
         FILE *file = fopen(SYNC_STATE_TEMP_FILE, "w");
 
         if (file == nullptr)
@@ -587,8 +504,7 @@ namespace pscd::storage
 
         fclose(file);
 
-        // Remove old file if it exists.
-        remove(path);
+        ::remove(path);
 
         int rename_result = rename(SYNC_STATE_TEMP_FILE, path);
 
@@ -601,4 +517,4 @@ namespace pscd::storage
         return true;
     }
 
-}
+} // namespace pscd::storage

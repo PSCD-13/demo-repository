@@ -2,9 +2,12 @@
 
 idf_component_register(
     SRCS
-        "detection_module.cpp"
+        "AbnormalDetector.cpp"
+        "HeartRateProcessor.cpp"
+        "falldetect.cpp"
     INCLUDE_DIRS
         "."
     REQUIRES
         models
+        sensors
 )

@@ -1,10 +1,8 @@
 #pragma once
 
-#include <cstdint>
+// Written with AI assistance for the specific question/context. All code has been reviewed and understood before implementation.
 
-#include "driver/gpio.h"
-#include "driver/spi_common.h"
-#include "sdmmc_cmd.h"
+#include <cstdint>
 
 #include "sensor_record.hpp"
 
@@ -19,8 +17,6 @@ namespace pscd::storage
         // Return false if it failed and the loop should stop.
         using record_callback = bool (*)(const pscd::model::sensor_record &record, void *user_data);
 
-        // Default SPI pins.
-        // Change these if your wiring is different.
         sd_module(
             int pin_mosi = 23,
             int pin_miso = 19,
@@ -30,7 +26,7 @@ namespace pscd::storage
 
         ~sd_module();
 
-        // Do not copy this class. It owns the SD card connection.
+
         sd_module(const sd_module &) = delete;
         sd_module &operator=(const sd_module &) = delete;
 
@@ -43,7 +39,6 @@ namespace pscd::storage
         bool is_ready() const;
 
         // Stores a record in measurements.csv.
-        // If record.record_id == 0, this function gives it the next id.
         bool append_record(pscd::model::sensor_record &record);
 
         // Reads last successfully sent record id from sync_state.txt.
@@ -85,13 +80,8 @@ namespace pscd::storage
 
         bool m_format_if_mount_failed = false;
         bool m_ready = false;
-        bool m_spi_bus_started = false;
-
-        sdmmc_card_t *m_card = nullptr;
 
         uint32_t m_last_record_id = 0;
-
-        static constexpr spi_host_device_t SPI_HOST_USED = SPI2_HOST;
 
         static constexpr const char *MOUNT_POINT = "/sdcard";
         static constexpr const char *MEASUREMENTS_FILE = "/sdcard/measurements.csv";
@@ -99,4 +89,4 @@ namespace pscd::storage
         static constexpr const char *SYNC_STATE_TEMP_FILE = "/sdcard/sync_state.tmp";
     };
 
-}
+} // namespace pscd::storage

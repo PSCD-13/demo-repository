@@ -12,10 +12,18 @@ namespace pscd::display
     void display_module::refreshDisplay()
     {
         xValue += 1;
-        renderGraph();
-        renderHeart();
-        renderTemp();
-        renderFall();
+        if (!renderEmergency())
+        {
+            tft.fillRect(DATAX, 151, 90, 110, TFT_BLACK);
+            if (values.heart_rate_valid)
+            {
+                renderGraph();
+                renderHeart();
+            }
+            if (values.skin_temp_valid)
+                renderTemp();
+            renderWorkout();
+        }
     }
 
     void display_module::updateData(pscd::model::sensor_record newVal)
@@ -31,8 +39,12 @@ namespace pscd::display
 
         tft.setTextSize(2);
         tft.setTextColor(TFT_WHITE, TFT_BLACK);
-        tft.setCursor(10, 140);
-        tft.print("Value:");
+        tft.setCursor(HEARTX, HEARTY);
+        tft.printf("Heart Rate:");
+        tft.setCursor(TEMPX, TEMPY);
+        tft.printf("Body Temp:");
+        tft.setCursor(WORKX, WORKY);
+        tft.printf("Workout Mode:");
 
         graph.createGraph(GRAPHWIDTH, GRAPHHEIGHT, TFT_BLACK);
 
@@ -40,7 +52,48 @@ namespace pscd::display
         graph.setGraphGrid(0, 10, 0, 10, TFT_DARKGREY);
         graph.drawGraph(GRAPHX, GRAPHY);
 
+        tft.setTextSize(1);
+        tft.setCursor(GRAPHX + GRAPHWIDTH + 2, GRAPHY - 4);
+        tft.printf("180");
+        tft.setCursor(GRAPHX + GRAPHWIDTH + 2, (GRAPHY + GRAPHHEIGHT) / 2);
+        tft.printf("BPM");
+        tft.setCursor(GRAPHX + GRAPHWIDTH + 2, GRAPHY + GRAPHHEIGHT - 4);
+        tft.printf("40");
+
         trace.startTrace(TFT_GREEN);
+        tft.setTextSize(2);
+    }
+
+    void display_module::reset()
+    {
+        tft.setRotation(1);
+        tft.fillScreen(TFT_BLACK);
+
+        tft.setTextSize(2);
+        tft.setTextColor(TFT_WHITE, TFT_BLACK);
+        tft.setCursor(HEARTX, HEARTY);
+        tft.printf("Heart Rate:");
+        tft.setCursor(TEMPX, TEMPY);
+        tft.printf("Body Temp:");
+        tft.setCursor(WORKX, WORKY);
+        tft.printf("Workout Mode:");
+
+        graph.createGraph(GRAPHWIDTH, GRAPHHEIGHT, TFT_BLACK);
+
+        graph.setGraphScale(0, GRAPHWIDTH, 0, GRAPHHEIGHT);
+        graph.setGraphGrid(0, 10, 0, 10, TFT_DARKGREY);
+        graph.drawGraph(GRAPHX, GRAPHY);
+
+        tft.setTextSize(1);
+        tft.setCursor(GRAPHX + GRAPHWIDTH + 2, GRAPHY - 4);
+        tft.printf("180");
+        tft.setCursor(GRAPHX + GRAPHWIDTH + 2, (GRAPHY + GRAPHHEIGHT) / 2);
+        tft.printf("BPM");
+        tft.setCursor(GRAPHX + GRAPHWIDTH + 2, GRAPHY + GRAPHHEIGHT - 4);
+        tft.printf("40");
+
+        trace.startTrace(TFT_GREEN);
+        tft.setTextSize(2);
     }
 
     void display_module::renderGraph()
@@ -52,41 +105,38 @@ namespace pscd::display
             trace.startTrace(TFT_GREEN);
         }
 
-        trace.addPoint(xValue, values.heart_rate_bpm);
-    }
-
-    void display_module::renderTime()
-    {
-        tft.fillRect(TIMEX, TIMEY, 150, 20, TFT_BLACK); // clear area
-        tft.setCursor(TIMEX, TIMEY);
-        tft.setTextColor(TFT_WHITE, TFT_BLACK);
-        tft.printf("TimeStamp: %d", values.timestamp_ms);
+        trace.addPoint(xValue, values.heart_rate_bpm - GRAPHMIN);
     }
 
     void display_module::renderHeart()
     {
-        tft.fillRect(HEARTX, HEARTY, 150, 20, TFT_BLACK); // clear area
-        tft.setCursor(HEARTX, HEARTY);
-        tft.setTextColor(TFT_WHITE, TFT_BLACK);
-        tft.printf("Value: %d", values.heart_rate_bpm);
+        tft.setCursor(DATAX, HEARTY);
+        tft.printf("%d BPM", values.heart_rate_bpm);
     }
 
     void display_module::renderTemp()
     {
-        tft.fillRect(TEMPX, TEMPY, 150, 20, TFT_BLACK); // clear area
-        tft.setCursor(TEMPX, TEMPY);
-        tft.setTextColor(TFT_WHITE, TFT_BLACK);
-        tft.printf("Body temp: %.1f°C Ambient temp: %.1f°C", values.skin_temp_c, values.ambient_temp_c);
+        tft.setCursor(DATAX, TEMPY);
+        tft.printf("%.1fC", values.skin_temp_c);
     }
 
-    void display_module::renderFall()
+    void display_module::renderWorkout()
     {
-        tft.fillRect(FALLX, FALLY, 150, 20, TFT_BLACK); // clear area
-        tft.setCursor(FALLX, FALLY);
-        tft.setTextColor(TFT_WHITE, TFT_BLACK);
-        if (values.fall_detected)
-            tft.printf("You are falling!");
+        tft.setCursor(DATAX, WORKY);
+        if (values.workout_mode)
+            tft.printf("ON");
         else
-            tft.printf("Not falling.");
+            tft.printf("OFF");
+    }
+
+    bool display_module::renderEmergency()
+    {
+        if (values.abnormal_heart_rate || values.fall_detected || values.panic_pressed)
+        {
+            tft.fillRect(DATAX + 90, 151, 40, 110, TFT_BLUE);
+            return true;
+        }
+        tft.fillRect(DATAX + 90, 151, 40, 110, TFT_BLACK);
+        return false;
     }
 }

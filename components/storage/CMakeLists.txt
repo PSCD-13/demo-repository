@@ -10,4 +10,16 @@ idf_component_register(
         sdmmc
         fatfs
         driver
+        framework-arduinoespressif32
+)
+
+set(PIO_LIBDEPS_DIR "${CMAKE_SOURCE_DIR}/.pio/libdeps/sparkfun_esp32s2_thing_plus_c")
+
+target_include_directories(${COMPONENT_LIB} PRIVATE
+    "${PIO_LIBDEPS_DIR}/TFT_eSPI"
+    "${PIO_LIBDEPS_DIR}/TFT_eWidget/src"
+    "${PIO_LIBDEPS_DIR}/TFT_eWidget/src/widgets/graph"
+    "${PIO_LIBDEPS_DIR}/TFT_eWidget/src/widgets/button"
+    "${PIO_LIBDEPS_DIR}/TFT_eWidget/src/widgets/meter"
+    "${PIO_LIBDEPS_DIR}/TFT_eWidget/src/widgets/slider"
 )

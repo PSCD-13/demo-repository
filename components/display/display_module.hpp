@@ -1,26 +1,25 @@
 #ifndef DISPLAY_HPP
 #define DISPLAY_HPP
 
-
 #include "sensor_record.hpp"
 
 #define GRAPHX 10
 #define GRAPHY 10
-#define GRAPHWIDTH 300
-#define GRAPHHEIGHT 120
+#define GRAPHWIDTH 280
+#define GRAPHHEIGHT 140
+#define GRAPHMIN 40
+#define GRAPHMAX 180
 
-#define TIMEX 10
-#define TIMEY 220
+#define DATAX 170
 
 #define HEARTX 10
-#define HEARTY 140
+#define HEARTY 160
 
 #define TEMPX 10
-#define TEMPY 160
+#define TEMPY 180
 
-#define FALLX 10
-#define FALLY 200
-
+#define WORKX 10
+#define WORKY 220
 namespace pscd::display
 {
     class display_module
@@ -32,16 +31,16 @@ namespace pscd::display
 
     private:
         void renderGraph();
-        void renderTime();
         void renderHeart();
         void renderTemp();
-        void renderFall();
+        void renderWorkout();
+        bool renderEmergency();
+        void reset();
 
         pscd::model::sensor_record values;
         int xValue = 0;
-
-
     };
+
 }
 
 #endif

@@ -20,10 +20,7 @@ namespace pscd::model
         float ambient_temp_c = 0.0f;
 
         bool motion_valid = false;
-        float accel_x = 0.0f;
-        float accel_y = 0.0f;
-        float accel_z = 0.0f;
-
+        
         bool workout_mode = false;
         bool manual_log = false;
         bool panic_pressed = false;
